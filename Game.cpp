@@ -29,6 +29,7 @@ void Game::Deal(Deck deck)
 	for (int j = 0; j < table.size(); j++)
 	{
 		table[j].SortHand();
+		table[j].UpdateNumSuits();
 	}
 }
 
@@ -38,14 +39,245 @@ void Game::Pass()
 	if (roundcount % 4 == 0)
 	{
 		std::cout << "Pass Left" << "\n";
+		std::vector<Card*>pass;
+		for (int i = 0; i < table.size(); i++)
+		{
+			table[i].PrintName(); std::cout << "What 3 cards would you like to pass?" << "\n";
+			table[i].DisplayHand();
+			int a, b, c;
+			for (;;)
+			{
+				if (std::cin >> a >> b >> c)
+				{
+					if (a >= 0 && a < table[i].Hand.size() && b >= 0 && b < table[i].Hand.size() && c >= 0 && c < table[i].Hand.size())
+					{
+						break;
+					}
+					else
+					{
+						std::cout << "Invalid integers, please enter integers corresponding to cards you wish to pass (Don't forget 0 indexing)" << "\n";
+					}
+				}
+				else
+				{
+					std::cout << "Invalid Input, Please enter integer places of cards you wish to pass" << "\n";
+					std::cin.clear();
+					std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+				}
+			}
+			if (a > b && b > c)
+			{
+				pass.push_back(table[i].PlayCard(a));
+				pass.push_back(table[i].PlayCard(b));
+				pass.push_back(table[i].PlayCard(c));
+			}
+			else if (a > c && c > b)
+			{
+				pass.push_back(table[i].PlayCard(a));
+				pass.push_back(table[i].PlayCard(c));
+				pass.push_back(table[i].PlayCard(b));
+			}
+			else if (b > a && a > c)
+			{
+				pass.push_back(table[i].PlayCard(b));
+				pass.push_back(table[i].PlayCard(a));
+				pass.push_back(table[i].PlayCard(c));
+			}
+			else if (b > c && c > a)
+			{
+				pass.push_back(table[i].PlayCard(b));
+				pass.push_back(table[i].PlayCard(c));
+				pass.push_back(table[i].PlayCard(a));
+			}
+			else if (c > b && b > a)
+			{
+				pass.push_back(table[i].PlayCard(c));
+				pass.push_back(table[i].PlayCard(b));
+				pass.push_back(table[i].PlayCard(a));
+			}
+			else if (c > a && a > b)
+			{
+				pass.push_back(table[i].PlayCard(c));
+				pass.push_back(table[i].PlayCard(a));
+				pass.push_back(table[i].PlayCard(b));
+			}
+		}
+		for (int i = 0; i < table.size(); i++)
+		{
+			int n = (i + 1) % 4;
+			table[n].Hand.push_back(pass[0]);
+			pass.erase(pass.begin());
+			table[n].Hand.push_back(pass[0]);
+			pass.erase(pass.begin());
+			table[n].Hand.push_back(pass[0]);
+			pass.erase(pass.begin());
+		}
+		for (int j = 0; j < table.size(); j++)
+		{
+			table[j].UpdateNumSuits();
+		}
 	}
 	else if (roundcount % 4 == 1)
 	{
 		std::cout << "Pass Right" << "\n";
+		std::vector<Card*>pass;
+		for (int i = 0; i < table.size(); i++)
+		{
+			table[i].PrintName(); std::cout << "What 3 cards would you like to pass?" << "\n";
+			table[i].DisplayHand();
+			int a, b, c;
+			for (;;)
+			{
+				if (std::cin >> a >> b >> c)
+				{
+					if (a >= 0 && a < table[i].Hand.size() && b >= 0 && b < table[i].Hand.size() && c >= 0 && c < table[i].Hand.size() && a!=b && a!=c && b!=c)
+					{
+						break;
+					}
+					else
+					{
+						std::cout << "Invalid integers, please enter 3 different integers corresponding to cards you wish to pass (Don't forget 0 indexing)" << "\n";
+					}
+				}
+				else
+				{
+					std::cout << "Invalid Input, Please enter integer places of cards you wish to pass" << "\n";
+					std::cin.clear();
+					std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+				}
+			}
+			if (a > b && b > c)
+			{
+				pass.push_back(table[i].PlayCard(a));
+				pass.push_back(table[i].PlayCard(b));
+				pass.push_back(table[i].PlayCard(c));
+			}
+			else if (a > c && c > b)
+			{
+				pass.push_back(table[i].PlayCard(a));
+				pass.push_back(table[i].PlayCard(c));
+				pass.push_back(table[i].PlayCard(b));
+			}
+			else if (b > a && a > c)
+			{
+				pass.push_back(table[i].PlayCard(b));
+				pass.push_back(table[i].PlayCard(a));
+				pass.push_back(table[i].PlayCard(c));
+			}
+			else if (b > c && c > a)
+			{
+				pass.push_back(table[i].PlayCard(b));
+				pass.push_back(table[i].PlayCard(c));
+				pass.push_back(table[i].PlayCard(a));
+			}
+			else if (c > b && b > a)
+			{
+				pass.push_back(table[i].PlayCard(c));
+				pass.push_back(table[i].PlayCard(b));
+				pass.push_back(table[i].PlayCard(a));
+			}
+			else if (c > a && a > b)
+			{
+				pass.push_back(table[i].PlayCard(c));
+				pass.push_back(table[i].PlayCard(a));
+				pass.push_back(table[i].PlayCard(b));
+			}
+		}
+		for (int i = 0; i < table.size(); i++)
+		{
+			int n = (i + 3) % 4;
+			table[n].Hand.push_back(pass[0]);
+			pass.erase(pass.begin());
+			table[n].Hand.push_back(pass[0]);
+			pass.erase(pass.begin());
+			table[n].Hand.push_back(pass[0]);
+			pass.erase(pass.begin());
+		}
+		for (int j = 0; j < table.size(); j++)
+		{
+			table[j].UpdateNumSuits();
+		}
 	}
 	else if (roundcount % 4 == 2)
 	{
 		std::cout << "Pass Across" << "\n";
+		std::vector<Card*>pass;
+		for (int i = 0; i < table.size(); i++)
+		{
+			table[i].PrintName(); std::cout << "What 3 cards would you like to pass?" << "\n";
+			table[i].DisplayHand();
+			int a, b, c;
+			for (;;)
+			{
+				if (std::cin >> a >> b >> c)
+				{
+					if (a >= 0 && a < table[i].Hand.size() && b >= 0 && b < table[i].Hand.size() && c >= 0 && c < table[i].Hand.size())
+					{
+						break;
+					}
+					else
+					{
+						std::cout << "Invalid integers, please enter integers corresponding to cards you wish to pass (Don't forget 0 indexing)" << "\n";
+					}
+				}
+				else
+				{
+					std::cout << "Invalid Input, Please enter integer places of cards you wish to pass" << "\n";
+					std::cin.clear();
+					std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+				}
+			}
+			if (a > b && b > c)
+			{
+				pass.push_back(table[i].PlayCard(a));
+				pass.push_back(table[i].PlayCard(b));
+				pass.push_back(table[i].PlayCard(c));
+			}
+			else if (a > c && c > b)
+			{
+				pass.push_back(table[i].PlayCard(a));
+				pass.push_back(table[i].PlayCard(c));
+				pass.push_back(table[i].PlayCard(b));
+			}
+			else if (b > a && a > c)
+			{
+				pass.push_back(table[i].PlayCard(b));
+				pass.push_back(table[i].PlayCard(a));
+				pass.push_back(table[i].PlayCard(c));
+			}
+			else if (b > c && c > a)
+			{
+				pass.push_back(table[i].PlayCard(b));
+				pass.push_back(table[i].PlayCard(c));
+				pass.push_back(table[i].PlayCard(a));
+			}
+			else if (c > b && b > a)
+			{
+				pass.push_back(table[i].PlayCard(c));
+				pass.push_back(table[i].PlayCard(b));
+				pass.push_back(table[i].PlayCard(a));
+			}
+			else if (c > a && a > b)
+			{
+				pass.push_back(table[i].PlayCard(c));
+				pass.push_back(table[i].PlayCard(a));
+				pass.push_back(table[i].PlayCard(b));
+			}
+		}
+		for (int i = 0; i < table.size(); i++)
+		{
+			int n = (i + 3) % 4;
+			table[n].Hand.push_back(pass[0]);
+			pass.erase(pass.begin());
+			table[n].Hand.push_back(pass[0]);
+			pass.erase(pass.begin());
+			table[n].Hand.push_back(pass[0]);
+			pass.erase(pass.begin());
+		}
+		for (int j = 0; j < table.size(); j++)
+		{
+			table[j].UpdateNumSuits();
+		}
 	}
 	else if (roundcount % 4 == 3)
 	{
@@ -153,6 +385,7 @@ void Game::Round()
 		table[i].PrintName(); std::cout << table[i].GetTotalPoints() << " (" << table[i].GetRoundPoints() << ") ";
 	}
 	std::cout << "\n";
+	Pass();
 	for (int i = 0; i < table.size(); i++)
 	{
 		for (Card* card : table[i].Hand)
