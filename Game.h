@@ -9,14 +9,16 @@
 class Game
 {
 	public:
+// leader tracks who starts a hand, tracker determines when all point cards have been played, roundcount determines which pass
 		int leader, tracker, roundcount;
-		bool HeartsBroken;
+// HeartsBroken is for legality checks in tricks, bust determines when the game ends
+		bool HeartsBroken, bust;
 		std::vector <Player> table;
 
 
 		Game(std::vector <Player> players);
 		~Game();
-
+		bool CheckBust();
 		void Deal(Deck deck);
 		void Trick();
 		void Pass();
