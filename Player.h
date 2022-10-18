@@ -22,6 +22,7 @@ public:
 	void PrintName();
 	int GetRoundPoints();
 	int GetTotalPoints();
+	void ResetRoundPoints();
 	void DisplayHand();
 	void SortHand();
 	int CheckNumSuits(int i);

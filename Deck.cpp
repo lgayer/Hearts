@@ -20,10 +20,6 @@ Deck::Deck()
 //ensure cards are also delted along with pointers
 Deck::~Deck()
 {
-	for (Card* card : deck)
-	{
-		delete card;
-	}
 	deck.clear();
 }
 

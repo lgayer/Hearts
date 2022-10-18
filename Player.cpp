@@ -47,6 +47,11 @@ int Player::GetTotalPoints()
 	return TotalPoints;
 }
 
+void Player::ResetRoundPoints()
+{
+	RoundPoints = 0;
+}
+
 //Print hand to command line
 void Player::DisplayHand()
 {
