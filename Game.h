@@ -20,6 +20,7 @@ class Game
 		~Game();
 		bool CheckBust();
 		void Deal(Deck deck);
+		void FirstTrick();
 		void Trick();
 		void Pass();
 		void Round();

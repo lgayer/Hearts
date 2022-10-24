@@ -84,7 +84,8 @@ void Player::UpdateNumSuits()
 	for (int i = 0; i < Hand.size(); i++)
 	{
 		int s = Hand[i]->GetSuit();
-		NumSuits[s-1] += 1;
+		s = s-1;
+		NumSuits[s] += 1;
 	}
 }
 

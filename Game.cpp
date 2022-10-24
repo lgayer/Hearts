@@ -391,10 +391,8 @@ void Game::ScoreUpdate()
 	}
 }
 
-
-// function to do a trick, determines winner of round and assigns round points according to what was played
-// needs play legality check
-void Game::Trick()
+//separate function for first trick to ensure 2 of clubs is lead and no points cards are played (unless someone has all points cards in hand)
+void Game::FirstTrick()
 {
 	std::vector<Card*> trick;
 	for (int i = 0; i < table.size(); i++)
@@ -402,9 +400,42 @@ void Game::Trick()
 		table[i].PrintName(); std::cout << table[i].GetTotalPoints() << " (" << table[i].GetRoundPoints() << ") ";
 	}
 	std::cout << "\n";
-	for (int i = 0; i < table.size(); i++)
+	table[leader].DisplayHand();
+	table[leader].PrintName(); std::cout << "What Card Would You Like to Play?" << "\n";
+	int b;
+	for (;;)
 	{
-		int x = (Game::leader + i) % 4;
+		if (std::cin >> b)
+		{
+			if (b >= 0 && b < table[leader].Hand.size())
+			{
+				if (*table[leader].Hand[b] == Card(Card::TWO,Card::CLUBS))
+				{
+					break;
+				}
+				else
+				{
+					std::cout << "Invalid choice, Please lead the 2C" << "\n";
+				}
+			}
+			else
+			{
+				std::cout << "Invalid choice, please enter integer corresponding to card you wish to play (Don't forget 0 indexing)" << "\n";
+			}
+		}
+		else
+		{
+			std::cout << "Invalid Input, Please enter integer place of card you wish to play" << "\n";
+			std::cin.clear();
+			std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+		}
+	}
+	trick.push_back(table[leader].PlayCard(b));
+	std::cout << "Trick: "; trick[0]->Print();  std::cout << "\n";
+
+	for (int i = 1; i < table.size(); i++)
+	{
+		int x = (leader + i) % 4;
 		table[x].DisplayHand();
 		table[x].PrintName(); std::cout << "What Card Would You Like to Play?" << "\n";
 		int a;
@@ -414,11 +445,50 @@ void Game::Trick()
 			{
 				if (a >= 0 && a < table[x].Hand.size())
 				{
-					break;
+					if (table[x].Hand[a]->GetSuit() == trick[0]->GetSuit())
+					{
+						break;
+					}
+					else
+					{
+						if (table[x].CheckNumSuits(trick[0]->GetSuit() - 1) == 0)
+						{
+							if (table[x].Hand[a]->GetSuit() == Card::HEARTS)
+							{
+								if (table[x].CheckNumSuits(Card::HEARTS) == 13)
+								{
+									break;
+								}
+								else 
+								{
+									std::cout << "Invalid choice, No points cards in Round 1" << "\n";
+								}
+							}
+							else if (*table[x].Hand[a] == Card(Card::QUEEN, Card::SPADES))
+							{
+								if (table[x].CheckNumSuits(Card::HEARTS) == 12)
+								{
+									std::cout << "Invalid choice, No points cards in Round 1" << "\n";
+								}
+								else
+								{
+									std::cout << "Invalid choice, No points cards in Round 1" << "\n";
+								}
+							}
+							else
+							{
+								break;
+							}
+						}
+						else
+						{
+							std::cout << "Invalid choice, Please follow suit" << "\n";
+						}
+					}
 				}
 				else
 				{
-					std::cout << "Invalid integer, please enter integer corresponding to card you wish to play (Don't forget 0 indexing)" << "\n";
+					std::cout << "Invalid choice, please enter integer corresponding to card you wish to play (Don't forget 0 indexing)" << "\n";
 				}
 			}
 			else
@@ -454,6 +524,142 @@ void Game::Trick()
 		if (card->GetSuit() == Card::HEARTS)
 		{
 			score += 1;
+			HeartsBroken = true;
+		}
+		else if (*card == Card(Card::QUEEN, Card::SPADES))
+		{
+			score += 13;
+		}
+	}
+	table[leader].IncreaseRoundPoints(score);
+	tracker += score;
+}
+
+
+// function to do a trick, determines winner of round and assigns round points according to what was played
+void Game::Trick()
+{
+	std::vector<Card*> trick;
+	for (int i = 0; i < table.size(); i++)
+	{
+		table[i].PrintName(); std::cout << table[i].GetTotalPoints() << " (" << table[i].GetRoundPoints() << ") ";
+	}
+	std::cout << "\n";
+	table[leader].DisplayHand();
+	table[leader].PrintName(); std::cout << "What Card Would You Like to Play?" << "\n";
+	int b;
+	for (;;)
+	{
+		if (std::cin >> b)
+		{
+			if (b >= 0 && b < table[leader].Hand.size())
+			{
+				if (table[leader].Hand[b]->GetSuit() == Card::HEARTS)
+				{
+					if (HeartsBroken == true)
+					{
+						break;
+					}
+					else
+					{
+						if (table[leader].CheckNumSuits(Card::HEARTS - 1) == table[leader].Hand.size())
+
+						{
+							break;
+						}
+						else
+						{
+							std::cout << "Hearts not Broken, Please pick another card to lead" << "\n";
+						}
+					}
+				}
+				else
+				{
+					break;
+				}
+			}
+			else
+			{
+				std::cout << "Invalid choice, please enter integer corresponding to card you wish to play (Don't forget 0 indexing)" << "\n";
+			}
+		}
+		else
+		{
+			std::cout << "Invalid Input, Please enter integer place of card you wish to play" << "\n";
+			std::cin.clear();
+			std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+		}
+	}
+	trick.push_back(table[leader].PlayCard(b));
+	std::cout << "Trick: "; trick[0]->Print();  std::cout << "\n";
+
+	for (int i = 1; i < table.size(); i++)
+	{
+		int x = (leader + i) % 4;
+		table[x].DisplayHand();
+		table[x].PrintName(); std::cout << "What Card Would You Like to Play?" << "\n";
+		int a;
+		for (;;)
+		{
+			if (std::cin >> a)
+			{
+				if (a >= 0 && a < table[x].Hand.size())
+				{
+					if (table[x].Hand[a]->GetSuit() == trick[0]->GetSuit())
+					{
+						break;
+					}
+					else
+					{
+						if (table[x].CheckNumSuits(trick[0]->GetSuit() - 1) == 0)
+						{
+							break;
+						}
+						else
+						{
+							std::cout << "Invalid choice, Please follow suit" << "\n";
+						}
+					}
+				}
+				else
+				{
+					std::cout << "Invalid choice, please enter integer corresponding to card you wish to play (Don't forget 0 indexing)" << "\n";
+				}
+			}
+			else
+			{
+				std::cout << "Invalid Input, Please enter integer place of card you wish to play" << "\n";
+				std::cin.clear();
+				std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+			}
+		}
+		trick.push_back(table[x].PlayCard(a));
+		std::cout << "Trick: ";
+		for (int j = 0; j <= i; j++)
+		{
+			trick[j]->Print();
+			std::cout << " ";
+		}
+		std::cout << "\n";
+	}
+	int adjust = leader;
+	leader = 0;
+	for (int i = 1; i < trick.size(); i++)
+	{
+		if (trick[i]->GetSuit() == trick[0]->GetSuit() && *trick[leader] < *trick[i])
+		{
+			leader = i;
+		}
+	}
+	leader = (leader + adjust) % 4;
+	table[leader].PrintName(); std::cout << "won the trick" << "\n";
+	int score = 0;
+	for (Card* card : trick)
+	{
+		if (card->GetSuit() == Card::HEARTS)
+		{
+			score += 1;
+			HeartsBroken = true;
 		}
 		else if (*card == Card(Card::QUEEN, Card::SPADES))
 		{
@@ -465,9 +671,9 @@ void Game::Trick()
 }
 
 // plays a full hand, determining leader by who has 2 of clubs, ending once all point cards have been played
-// still need special rules for first trick
 void Game::Round()
 {
+	HeartsBroken = false;
 	for (int i = 0; i < table.size(); i++)
 	{
 		table[i].PrintName(); std::cout << table[i].GetTotalPoints() << "(" << table[i].GetRoundPoints() << ") ";
@@ -486,6 +692,7 @@ void Game::Round()
 	}
 	table[leader].PrintName(); std::cout << "starts the trick" << "\n";
 	tracker = 0;
+	FirstTrick();
 	while(tracker<26)
 	{
 		Trick();
