@@ -3,7 +3,8 @@
 #include "Player.h"
 #include "Game.h"
 #include <iostream>
-#include<ctime>
+#include <string>
+#include <ctime>
 
 
 int main()
@@ -13,10 +14,13 @@ int main()
 	Deck deck;
 
 	std::vector<Player> test;
-	test.push_back(Player("Luke1"));
-	test.push_back(Player("Luke2"));
-	test.push_back(Player("Luke3"));
-	test.push_back(Player("Luke4"));
+	std::string name1, name2, name3, name4;
+	std::cout << "Welcome. Please enter the names of the 4 players" << "\n";
+	std::cin >> name1 >> name2 >> name3 >> name4;
+	test.push_back(Player(name1));
+	test.push_back(Player(name2));
+	test.push_back(Player(name3));
+	test.push_back(Player(name4));
 
 	Game hearts = Game(test);
 	while (hearts.CheckBust() == false)
